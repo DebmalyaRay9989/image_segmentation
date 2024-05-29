@@ -94,7 +94,8 @@ def recognize():
             total_area += area
    
         cv2.imshow("res", image)
-        cv2.imwrite("image_res.jpg", image)
+        path = 'static/result_photo/'
+        cv2.imwrite(str(path) + "image_res.jpg", image) 
         
         print("*************************************************************************************************")
         print("*************************************************************************************************")
