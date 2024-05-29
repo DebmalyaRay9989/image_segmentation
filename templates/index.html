@@ -84,6 +84,15 @@
         .bi {
             margin-right: 5px;
         }
+        .fit {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .center {
+            border: 3px solid red;
+            display: block;
+            margin: auto;
+        }
         p {
             color: green;
             font-size: 15px;
@@ -117,11 +126,17 @@
             <p><b>"Total Area Covered :" </b> {{TOTAL_AREA_COVERED}} </p>
             <br>
             <br>
-
+            <b><u>RESULT DATA :</u></b>
+            <br>
+            <br>
+            <image class="center fit" src="{{url_for('static',filename = 'result_photo/image_res.jpg')}}" width="850" height=500"></image>
+            <br>
+            <br>
     </form>
     </ul>
     </div>
-    <img src="{{ image }}" alt="User Image">
+    <!-- <img src="{{ image }}" alt="User Image"> -->'
+    <!--<image src="{{url_for('static',filename = 'result_photo/image_res.jpg')}}" ></image>-->
 
 </body>
 
