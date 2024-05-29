@@ -19,13 +19,20 @@ from csv import DictWriter
 from water_droplet_area_count_modified import unsharp_mask
 from water_droplet_area_count_modified import mouse_call_back
 
+STATIC_FOLDER = os.path.join('static', 'result_photo')
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = STATIC_FOLDER
 img5 = os.path.join('static', 'Image')
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
+@app.route('/index')
+def show_index():
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image_res.jpg')
+    return render_template("index.html", user_image = full_filename)
 
 @app.route('/recognize', methods=['GET', 'POST'])
 def recognize():
@@ -121,7 +128,7 @@ def recognize():
                 f_object.close()
 
 
-        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, TOTAL_AREA_COVERED=total_area, img_data=image)
+        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, TOTAL_AREA_COVERED=total_area, image=image)
  
     else:
 

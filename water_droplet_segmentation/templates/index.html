@@ -99,8 +99,7 @@
     <div class="container mt-5">
     <ul>
         <h1><i class="bi bi-terminal"></i>Water Droplets Image Segmentation</h1>
-
- <!--     <form action="/upload" method="POST" enctype="multipart/form-data" class="mb-4"> -->  
+  
     <form action = "/recognize" method = "POST" enctype = "multipart/form-data">
             <div class="mb-3">
                <!--<input class="form-control" type="file" name="file"> --> 
@@ -109,7 +108,7 @@
             <button class="btn btn-primary" type="submit">
                 <span class="bi bi-cloud-upload"></span> Upload
             </button>
-  <!--          </form>    -->
+ 
             <br>
             <br>
             <p><b>"Name of the Image File :"</b> {{NAME}}</p>
@@ -118,12 +117,11 @@
             <p><b>"Total Area Covered :" </b> {{TOTAL_AREA_COVERED}} </p>
             <br>
             <br>
-            <br>
 
     </form>
     </ul>
     </div>
-
+    <img src="{{ image }}" alt="User Image">
 
 </body>
 
