@@ -7,7 +7,6 @@ import numpy as np
 import glob
 import csv
 import os
-import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 import base64
