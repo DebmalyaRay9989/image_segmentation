@@ -11,7 +11,7 @@ MarkupSafe==2.1.5
 numpy==1.24.4
 pandas
 seaborn
-opencv-python==4.9.0.80
+opencv-python-headless
 packaging==24.0
 werkzeug==3.0.1
 zipp==3.18.1
