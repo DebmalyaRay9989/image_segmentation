@@ -80,7 +80,7 @@ def recognize():
         result = cv2.bitwise_and(image, image, mask=thresh)
         result[thresh==0] = (255,255,255)
         
-        # cv2.namedWindow("res")
+        cv2.namedWindow("res")
         cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
         
         for idx, c in enumerate(contours):  # numbers the contours
@@ -94,7 +94,7 @@ def recognize():
                 cv2.putText(image, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 204), 2)
             total_area += area
    
-        cv2.imshow("res", image)
+        # cv2.imshow("res", image)
         path = 'static/result_photo/'
         cv2.imwrite(str(path) + "image_res.jpg", image) 
         
