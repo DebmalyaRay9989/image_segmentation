@@ -35,7 +35,7 @@ rcParams['figure.figsize'] = 14.7,10.27
 ax = sns.barplot(x=np.arange(len(list2)), y=list2)
 ax.bar_label(ax.containers[0])
 
-plt.axis('off')
+plt.axis('on')
 plt.show()
 
 # %%
