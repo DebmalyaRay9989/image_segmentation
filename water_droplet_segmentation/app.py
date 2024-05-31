@@ -80,7 +80,7 @@ def recognize():
         result = cv2.bitwise_and(image, image, mask=thresh)
         result[thresh==0] = (255,255,255)
         
-        cv2.namedWindow("res")
+        # cv2.namedWindow("res")
         cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
         
         for idx, c in enumerate(contours):  # numbers the contours
