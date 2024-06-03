@@ -118,6 +118,7 @@ def recognize():
         
         #with open('result3.csv', 'a', newline='') as f_object:
         with open('result3.csv', 'a', newline='') as f_object:
+            f_object.truncate()
             field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'TOTAL_AREA_COVERED']
             writer = csv.DictWriter(f_object,  delimiter=',', lineterminator='\n',fieldnames=field_names)
             if not file_exists:
@@ -157,8 +158,9 @@ def viewplot():
         from matplotlib import rcParams
 
         # figure size in inches
-        rcParams['figure.figsize'] = 14.7,10.27
-
+        # rcParams['figure.figsize'] = 21.7,12.27
+        sns.set_style("darkgrid")
+        sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
         ax = sns.barplot(x=np.arange(len(list2)), y=list2)
         ax.bar_label(ax.containers[0])
         fig = ax.get_figure()
