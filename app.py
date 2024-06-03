@@ -145,6 +145,8 @@ def viewplot():
         
         df1 = pd.read_csv("result3.csv")
         print(df1.columns)
+        df1 = df1.iloc[::-1]
+        print(df1.shape)
         col_vals = df1["DROPLETS_SIZE_LIST"].values.tolist()
         col_vals = col_vals[0]
         print(col_vals)
