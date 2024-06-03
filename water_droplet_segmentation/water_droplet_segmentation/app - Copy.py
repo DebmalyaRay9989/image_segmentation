@@ -3,8 +3,7 @@ import os
 from flask import Flask, render_template, request, url_for, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import cv2
-import pandas as pd
-import seaborn as sns
+import numpy as np
 import glob
 import csv
 import os
@@ -80,7 +79,7 @@ def recognize():
         result = cv2.bitwise_and(image, image, mask=thresh)
         result[thresh==0] = (255,255,255)
         
-        # cv2.namedWindow("res")
+        cv2.namedWindow("res")
         cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
         
         for idx, c in enumerate(contours):  # numbers the contours
@@ -94,7 +93,7 @@ def recognize():
                 cv2.putText(image, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 204), 2)
             total_area += area
    
-        # cv2.imshow("res", image)
+        cv2.imshow("res", image)
         path = 'static/result_photo/'
         cv2.imwrite(str(path) + "image_res.jpg", image) 
         
@@ -113,22 +112,21 @@ def recognize():
             'DROPLETS_SIZE_LIST': l1,
             'TOTAL_AREA_COVERED': total_area
         }
-               
+            
+            
         file_exists = os.path.isfile('result3.csv')
         
-        #with open('result3.csv', 'a', newline='') as f_object:
         with open('result3.csv', 'a', newline='') as f_object:
-            f_object.truncate()
             field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'TOTAL_AREA_COVERED']
             writer = csv.DictWriter(f_object,  delimiter=',', lineterminator='\n',fieldnames=field_names)
             if not file_exists:
                 writer.writeheader()
-            writer.writerow({'NAME': file1,
-                            'DROPLET_COUNT_APPROX': str(len(l1)),
-                            'DROPLETS_SIZE_LIST': l1,
-                            'TOTAL_AREA_COVERED': total_area})
-            cv2.waitKey()
-            f_object.close()
+                writer.writerow({'NAME': file1,
+                                'DROPLET_COUNT_APPROX': str(len(l1)),
+                                'DROPLETS_SIZE_LIST': l1,
+                                'TOTAL_AREA_COVERED': total_area})
+                cv2.waitKey()
+                f_object.close()
 
 
         return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, TOTAL_AREA_COVERED=total_area, image=image)
@@ -136,39 +134,7 @@ def recognize():
     else:
 
         return render_template('index.html')
-
-
-@app.route('/viewplot', methods=['GET', 'POST'])
-
-def viewplot():
     
-    if request.method == 'POST':
-        
-        df1 = pd.read_csv("result3.csv")
-        print(df1.columns)
-        df1 = df1.iloc[::-1]
-        print(df1.shape)
-        col_vals = df1["DROPLETS_SIZE_LIST"].values.tolist()
-        col_vals = col_vals[0]
-        print(col_vals)
-        import ast
-        list2 = ast.literal_eval(col_vals)
-        print(type(list2))
-        
-        from matplotlib import rcParams
-
-        # figure size in inches
-        # rcParams['figure.figsize'] = 21.7,12.27
-        sns.set_style("darkgrid")
-        sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
-        ax = sns.barplot(x=np.arange(len(list2)), y=list2)
-        ax.bar_label(ax.containers[0])
-        fig = ax.get_figure()
-        plt.axis('on')
-        output_dir = 'static/result_photo'
-        fig.savefig('{}/plot.jpg'.format(output_dir))
-        
-    return render_template('viewplots.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
