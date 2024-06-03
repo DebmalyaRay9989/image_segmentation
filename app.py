@@ -162,7 +162,7 @@ def viewplot():
         ax = sns.barplot(x=np.arange(len(list2)), y=list2)
         ax.bar_label(ax.containers[0])
         fig = ax.get_figure()
-        plt.axis('off')
+        plt.axis('on')
         output_dir = 'static/result_photo'
         fig.savefig('{}/plot.jpg'.format(output_dir))
         
