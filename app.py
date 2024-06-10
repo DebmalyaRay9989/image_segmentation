@@ -170,6 +170,40 @@ def viewplot():
         
     return render_template('viewplots.html')
 
+@app.route('/viewplot2', methods=['GET', 'POST'])
+
+def viewplot2():
+    
+    if request.method == 'POST':
+        
+        df1 = pd.read_csv("result3.csv")
+        print(df1.columns)
+        df1 = df1.iloc[::-1]
+        print(df1.shape)
+        col_vals = df1["DROPLETS_SIZE_LIST"].values.tolist()
+        col_vals = col_vals[0]
+        print(col_vals)
+        import ast
+        list2 = ast.literal_eval(col_vals)
+        print(type(list2))
+        
+        from matplotlib import rcParams
+
+        # figure size in inches
+        # rcParams['figure.figsize'] = 21.7,12.27
+        sns.set_style("darkgrid")
+        sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
+        ax = sns.lineplot(x=np.arange(len(list2)), y=list2)
+        # ax = sns.tsplot(list2)
+        # ax.bar_label(ax.containers[0])
+        fig = ax.get_figure()
+        plt.axis('on')
+        output_dir = 'static/result_photo'
+        fig.savefig('{}/plot2.jpg'.format(output_dir))
+        
+    return render_template('viewplots2.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True)
  

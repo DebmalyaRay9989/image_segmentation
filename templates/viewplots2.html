@@ -104,8 +104,8 @@
             background-color: rgb(186, 218, 186);
         }
         .btn-group button {
-            background-color: #04AA6D; /* Green background */
-            border: 1px solid green; /* Green border */
+            background-color: #012b1c; /* Green background */
+            border: 1px solid rgb(5, 87, 5); /* Green border */
             color: white; /* White text */
             padding: 10px 24px; /* Some padding */
             cursor: pointer; /* Pointer/hand icon */
@@ -135,41 +135,18 @@
     <div class="container mt-5">
     <ul>
         <h1><i class="bi bi-terminal"></i>Water Droplets Image Segmentation</h1>
-  
-    <form action = "/recognize" method = "POST" enctype = "multipart/form-data">
-            <div class="mb-3">
-               <!--<input class="form-control" type="file" name="file"> --> 
-                <input class="form-control" type="file" name="image" id="file">
-            </div>
-            <button class="btn btn-primary" type="submit">
-                <span class="bi bi-cloud-upload"></span> Upload
-            </button>
- 
-            <br>
-            <br>
-            <p><b>"Name of the Image File :"</b> {{NAME}}</p>
-            <p><b>"Approx Droplet Counts :" </b> {{DROPLET_COUNT_APPROX}} </p>
-            <p><b>"List Of All Droplets(Size):"</b>  {{DROPLETS_SIZE_LIST}} </p>
-            <p><b>"Total Area Covered :" </b> {{TOTAL_AREA_COVERED}} </p>
-            <br>
-            <br>
-            <b><u>RESULT DATA :</u></b>
-            <br>
-            <br>
-            <image class="center fit" src="{{url_for('static',filename = 'result_photo/image_res.jpg')}}" width="850" height=500"></image>
-            <br>
-            <br>
-    </form>
+    
+        <br>
+        <br>
+        <image class="center fit" src="{{url_for('static',filename = 'result_photo/plot2.jpg')}}" width="850" height=500"></image>
+        <br>
+        <br>
+    
     <div class="btn-group">
     <form action="/">
         <button type="submit">CLICK HOME</button>
     </form>
-    <form action="/viewplot" method = "POST" enctype = "multipart/form-data">
-        <button type="submit">VIEW PLOT - BAR </button>
-    </form>
-    <form action="/viewplot2" method = "POST" enctype = "multipart/form-data">
-        <button type="submit">VIEW PLOT - LINE </button>
-    </form>
+
     </div>
     </ul>
     </div>
