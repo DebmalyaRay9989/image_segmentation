@@ -193,7 +193,7 @@ def viewplot2():
         # rcParams['figure.figsize'] = 21.7,12.27
         sns.set_style("darkgrid")
         sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
-        ax = sns.lineplot(x=np.arange(len(list2)), y=list2, linewidth=10)
+        ax = sns.lineplot(x=np.arange(len(list2)), y=list2, linewidth=8)
         # ax = sns.tsplot(list2)
         # ax.bar_label(ax.containers[0])
         fig = ax.get_figure()
