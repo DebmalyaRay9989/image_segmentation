@@ -1,4 +1,5 @@
 
+
 import os
 from flask import Flask, render_template, request, url_for, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
@@ -57,11 +58,11 @@ def recognize():
 
         edged = cv2.Canny(blending, 30, 200)
         
-        contours, hierarchy = cv2.findContours(edged, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center_moments= cv2.moments(contours[0])
         
         
-        cv2.drawContours(image = edged,
+        cv2.drawContours(image = thresh,
                  contours = contours,
                  contourIdx = -1,
                  color = (0, 0, 255),
@@ -193,7 +194,7 @@ def viewplot2():
         # rcParams['figure.figsize'] = 21.7,12.27
         sns.set_style("darkgrid")
         sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
-        ax = sns.lineplot(x=np.arange(len(list2)), y=list2, linewidth=7)
+        ax = sns.lineplot(x=np.arange(len(list2)), y=list2, linewidth=6)
         # ax = sns.tsplot(list2)
         # ax.bar_label(ax.containers[0])
         fig = ax.get_figure()
@@ -207,3 +208,4 @@ def viewplot2():
 if __name__ == "__main__":
     app.run(debug=True)
  
+

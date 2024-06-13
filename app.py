@@ -57,11 +57,11 @@ def recognize():
 
         edged = cv2.Canny(blending, 30, 200)
         
-        contours, hierarchy = cv2.findContours(edged, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center_moments= cv2.moments(contours[0])
         
         
-        cv2.drawContours(image = edged,
+        cv2.drawContours(image = thresh,
                  contours = contours,
                  contourIdx = -1,
                  color = (0, 0, 255),
@@ -69,8 +69,12 @@ def recognize():
                  
         # %%
         total_area = 0
+        total_perimeter = 0
+        equi_diameter = 0
+
         l1 = []
-        #l2 = []
+        l2 = []
+        l3 = []
         smallest = sorted(contours, key=cv2.contourArea)[0]
         largest = sorted(contours, key=cv2.contourArea)[-1]
         
@@ -87,12 +91,22 @@ def recognize():
             x = int(sum(c[:,0,0]) / len(c))
             y = int(sum(c[:,0,1]) / len(c))
             #x,y,w,h = cv2.boundingRect(c)
+            #####  ============== Contour Area ============= #####
             area = cv2.contourArea(c)
+            #####  ============== Contour Perimeter ============= #####
+            perimeter = cv2.arcLength(c,True)
+            ##### ==============  Equivalent Diameter =========== ######
+            ##### Equivalent Diameter is the diameter of the circle whose area is same as the contour area. ######
+            ##### np.sqrt(4*area/np.pi) #########
+            equi_diameter = np.sqrt(4*area/np.pi)
             if (area > 4.0):
                 l1.append(area)
+                l2.append(perimeter)
+                l3.append(equi_diameter)
                 image = cv2.drawContours(image, [c], 0, (222, 49, 99), 3)
                 cv2.putText(image, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 204), 2)
             total_area += area
+            total_perimeter += perimeter
    
         # cv2.imshow("res", image)
         path = 'static/result_photo/'
@@ -103,7 +117,10 @@ def recognize():
         print("The Image Name : ", file1)
         print("Number of Droplets found : " + str(len(l1)))
         print("The list of area of each water droplets : ", l1)
+        print("The list of perimeter of each water droplets : ", l2)
+        print("The list of equivalent diameter of each water droplets : ", l3)
         print('Total area: {}'.format(total_area))
+        print('Total Perimeter: {}'.format(total_perimeter))
         print("**************************************************************************************************")
         print("**************************************************************************************************")
         
@@ -111,7 +128,10 @@ def recognize():
             'NAME': file1,
             'DROPLET_COUNT_APPROX': str(len(l1)),
             'DROPLETS_SIZE_LIST': l1,
-            'TOTAL_AREA_COVERED': total_area
+            'DROPLETS_PERIMETER_LIST': l2,
+            'DROPLETS_EQUIVALENT_DIAMETER': l3,
+            'TOTAL_AREA_COVERED': total_area,
+            'TOTAL_PERIMETER_COVERED': total_perimeter
         }
                
         file_exists = os.path.isfile('result3.csv')
@@ -119,19 +139,22 @@ def recognize():
         #with open('result3.csv', 'a', newline='') as f_object:
         with open('result3.csv', 'a', newline='') as f_object:
             f_object.truncate()
-            field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'TOTAL_AREA_COVERED']
+            field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'DROPLETS_PERIMETER_LIST', 'DROPLETS_EQUIVALENT_DIAMETER', 'TOTAL_AREA_COVERED', 'TOTAL_PERIMETER_COVERED']
             writer = csv.DictWriter(f_object,  delimiter=',', lineterminator='\n',fieldnames=field_names)
             if not file_exists:
                 writer.writeheader()
             writer.writerow({'NAME': file1,
                             'DROPLET_COUNT_APPROX': str(len(l1)),
                             'DROPLETS_SIZE_LIST': l1,
-                            'TOTAL_AREA_COVERED': total_area})
+                            'DROPLETS_PERIMETER_LIST': l2,
+                            'DROPLETS_EQUIVALENT_DIAMETER': l3,
+                            'TOTAL_AREA_COVERED': total_area,
+                            'TOTAL_PERIMETER_COVERED': total_perimeter})
             cv2.waitKey()
             f_object.close()
 
 
-        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, TOTAL_AREA_COVERED=total_area, image=image)
+        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, DROPLETS_PERIMETER_LIST=l2, DROPLETS_EQUIVALENT_DIAMETER=l3, TOTAL_AREA_COVERED=total_area, TOTAL_PERIMETER_COVERED=total_perimeter, image=image)
  
     else:
 
@@ -159,15 +182,16 @@ def viewplot():
 
         # figure size in inches
         # rcParams['figure.figsize'] = 21.7,12.27
-        sns.set_style("darkgrid")
-        sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
-        ax = sns.barplot(x=np.arange(len(list2)), y=list2)
-        ax.bar_label(ax.containers[0])
-        fig = ax.get_figure()
-        plt.axis('on')
         output_dir = 'static/result_photo'
-        fig.savefig('{}/plot.jpg'.format(output_dir))
-        
+        #fig = ax.get_figure()
+        fig = plt.figure(figsize = (10, 5))
+        plt.bar(np.arange(len(list2)), list2, color ='maroon', width = 0.4)
+        plt.axis('on')
+        plt.xlabel("Length of the List")
+        plt.ylabel("Entities within the List")
+        plt.savefig('static/result_photo/plot.jpg')
+        #fig.savefig('{}/plot.jpg'.format(output_dir))
+
     return render_template('viewplots.html')
 
 @app.route('/viewplot2', methods=['GET', 'POST'])
@@ -176,11 +200,11 @@ def viewplot2():
     
     if request.method == 'POST':
         
-        df1 = pd.read_csv("result3.csv")
-        print(df1.columns)
-        df1 = df1.iloc[::-1]
-        print(df1.shape)
-        col_vals = df1["DROPLETS_SIZE_LIST"].values.tolist()
+        df2 = pd.read_csv("result3.csv")
+        print(df2.columns)
+        df2 = df2.iloc[::-1]
+        print(df2.shape)
+        col_vals = df2["DROPLETS_SIZE_LIST"].values.tolist()
         col_vals = col_vals[0]
         print(col_vals)
         import ast
@@ -191,15 +215,15 @@ def viewplot2():
 
         # figure size in inches
         # rcParams['figure.figsize'] = 21.7,12.27
-        sns.set_style("darkgrid")
-        sns.set_theme(rc={'figure.figsize': (21.7,12.27)})
-        ax = sns.lineplot(x=np.arange(len(list2)), y=list2, linewidth=7)
-        # ax = sns.tsplot(list2)
-        # ax.bar_label(ax.containers[0])
-        fig = ax.get_figure()
-        plt.axis('on')
         output_dir = 'static/result_photo'
-        fig.savefig('{}/plot2.jpg'.format(output_dir))
+        #fig = ax.get_figure()
+        fig = plt.figure(figsize = (10, 5))
+        plt.plot(np.arange(len(list2)), list2, color="#6c3376", linewidth=3)
+        plt.axis('on')
+        plt.xlabel("Length of the List")
+        plt.ylabel("Entities within the List")
+        plt.savefig('static/result_photo/plot2.jpg')
+        #fig.savefig('{}/plot2.jpg'.format(output_dir))
         
     return render_template('viewplots2.html')
 
