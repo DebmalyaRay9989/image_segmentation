@@ -2,6 +2,7 @@
 import os
 from flask import Flask, render_template, request, url_for, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 import cv2
 import pandas as pd
 import seaborn as sns
@@ -15,6 +16,7 @@ import base64
 from PIL import Image
 import base64
 import io
+import json
 # Import DictWriter class from CSV module
 from csv import DictWriter
 from water_droplet_area_count_modified import unsharp_mask
@@ -227,6 +229,29 @@ def viewplot2():
         
     return render_template('viewplots2.html')
 
+@app.errorhandler(Exception)  
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+
+    # now you're handling non-HTTP exceptions only
+    return render_template("500_generic.html", e=e), 500
+#def handle_exception(e):
+#    """Return JSON instead of HTML for HTTP errors."""
+#    # start with the correct headers and status code from the error
+#    response = e.get_response()
+#    # replace the body with JSON
+#    response.data = json.dumps({
+#        "error": {
+#            "code": e.code,
+#            "name": e.name,
+#            "description": e.description,
+#        }
+#    })
+#    print(response.data) 
+#    response.content_type = "application/json"
+#    return response
 
 if __name__ == "__main__":
     app.run(debug=True)
