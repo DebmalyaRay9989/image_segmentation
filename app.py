@@ -17,10 +17,13 @@ from PIL import Image
 import base64
 import io
 import json
+import math
 # Import DictWriter class from CSV module
 from csv import DictWriter
 from water_droplet_area_count_modified import unsharp_mask
 from water_droplet_area_count_modified import mouse_call_back
+from skimage.measure import regionprops, regionprops_table
+import pyclesperanto_prototype as cle
 
 STATIC_FOLDER = os.path.join('static', 'result_photo')
 
@@ -61,8 +64,15 @@ def recognize():
         
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center_moments= cv2.moments(contours[0])
+        stats = regionprops(cle.pull(thresh).astype(int))
+        regions = regionprops(cle.pull(thresh).astype(int))
+        props = regionprops_table(
+                cle.pull(thresh).astype(int),
+                properties=('centroid', 'orientation', 'axis_major_length', 'axis_minor_length'),)
+
         
-        
+        #print(stats[0]['minor_axis_length'])
+        #print(stats[0]['major_axis_length'])
         cv2.drawContours(image = thresh,
                  contours = contours,
                  contourIdx = -1,
@@ -98,7 +108,6 @@ def recognize():
             #####  ============== Contour Perimeter ============= #####
             perimeter = cv2.arcLength(c,True)
             ##### ==============  Equivalent Diameter =========== ######
-            ##### Equivalent Diameter is the diameter of the circle whose area is same as the contour area. ######
             ##### np.sqrt(4*area/np.pi) #########
             equi_diameter = np.sqrt(4*area/np.pi)
             if (area > 4.0):
@@ -123,6 +132,14 @@ def recognize():
         print("The list of equivalent diameter of each water droplets : ", l3)
         print('Total area: {}'.format(total_area))
         print('Total Perimeter: {}'.format(total_perimeter))
+        props2 = pd.DataFrame(props)
+       # print(props2)
+        ext_centroid_1 = props2["centroid-0"].values.tolist()
+        ext_centroid_2 = props2["centroid-1"].values.tolist()
+        major_axes_1 = props2["axis_major_length"].values.tolist()
+        minor_axes_1 = props2["axis_minor_length"].values.tolist()
+        print("Major Axes: {}".format(major_axes_1))
+        print("Minor Axes: {}".format(minor_axes_1))
         print("**************************************************************************************************")
         print("**************************************************************************************************")
         
@@ -133,7 +150,9 @@ def recognize():
             'DROPLETS_PERIMETER_LIST': l2,
             'DROPLETS_EQUIVALENT_DIAMETER': l3,
             'TOTAL_AREA_COVERED': total_area,
-            'TOTAL_PERIMETER_COVERED': total_perimeter
+            'TOTAL_PERIMETER_COVERED': total_perimeter,
+            'MAJOR_AXES': str(major_axes_1),
+            'MINOR_AXES': str(minor_axes_1)
         }
                
         file_exists = os.path.isfile('result3.csv')
@@ -141,7 +160,7 @@ def recognize():
         #with open('result3.csv', 'a', newline='') as f_object:
         with open('result3.csv', 'a', newline='') as f_object:
             f_object.truncate()
-            field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'DROPLETS_PERIMETER_LIST', 'DROPLETS_EQUIVALENT_DIAMETER', 'TOTAL_AREA_COVERED', 'TOTAL_PERIMETER_COVERED']
+            field_names = ['NAME', 'DROPLET_COUNT_APPROX', 'DROPLETS_SIZE_LIST', 'DROPLETS_PERIMETER_LIST', 'DROPLETS_EQUIVALENT_DIAMETER', 'TOTAL_AREA_COVERED', 'TOTAL_PERIMETER_COVERED', 'MAJOR_AXES', 'MINOR_AXES']
             writer = csv.DictWriter(f_object,  delimiter=',', lineterminator='\n',fieldnames=field_names)
             if not file_exists:
                 writer.writeheader()
@@ -151,12 +170,14 @@ def recognize():
                             'DROPLETS_PERIMETER_LIST': l2,
                             'DROPLETS_EQUIVALENT_DIAMETER': l3,
                             'TOTAL_AREA_COVERED': total_area,
-                            'TOTAL_PERIMETER_COVERED': total_perimeter})
+                            'TOTAL_PERIMETER_COVERED': total_perimeter,
+                            'MAJOR_AXES': str(major_axes_1),
+                            'MINOR_AXES': str(minor_axes_1)})
             cv2.waitKey()
             f_object.close()
 
 
-        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, DROPLETS_PERIMETER_LIST=l2, DROPLETS_EQUIVALENT_DIAMETER=l3, TOTAL_AREA_COVERED=total_area, TOTAL_PERIMETER_COVERED=total_perimeter, image=image)
+        return render_template('index.html', NAME=file1, DROPLET_COUNT_APPROX=str(len(l1)), DROPLETS_SIZE_LIST=l1, DROPLETS_PERIMETER_LIST=l2, DROPLETS_EQUIVALENT_DIAMETER=l3, TOTAL_AREA_COVERED=total_area, MAJOR_AXIS=str(major_axes_1), MINOR_AXIS=str(minor_axes_1), TOTAL_PERIMETER_COVERED=total_perimeter, MAJOR_AXES=str(major_axes_1), MINOR_AXES=str(minor_axes_1), image=image)
  
     else:
 
@@ -255,4 +276,6 @@ def handle_exception(e):
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
  
+
