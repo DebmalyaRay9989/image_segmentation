@@ -11,6 +11,8 @@ MarkupSafe==2.1.5
 numpy==1.24.4
 pandas
 seaborn
+scikit-image
+pyclesperanto-prototype
 opencv-python
 packaging==24.0
 werkzeug==3.0.1
